@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Сервера и Тарифы</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+<!--        .custom-tooltip {-->
+<!--          &#45;&#45;bs-tooltip-bg: var(&#45;&#45;bd-white);-->
+<!--          &#45;&#45;bs-tooltip-color: var(&#45;&#45;bs-black);-->
+<!--        }-->
+
+        .btn {
+            white-space: nowrap;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container mt-4">
+
+        <div class="mb-5">
+            <h1>Виртуальные серверы с сайта Aeza</h1>
+        </div>
+
+        <!-- Форма фильтрации -->
+        <form method="get" class="row mb-4">
+
+            <div class="col">
+                <label for="server_type" class="form-label">Тип сервера</label>
+                <select id="server_type" name="server_type" class="form-select" multiple>
+                    <option value="Promo" {% if 'Promo' in server_types %}selected{% endif %}>Promo</option>
+                    <option value="Shared" {% if 'Shared' in server_types %}selected{% endif %}>Shared</option>
+                    <option value="Dedicated" {% if 'Dedicated' in server_types %}selected{% endif %}>Dedicated</option>
+                </select>
+            </div>
+
+            <div class="col">
+                <div class="mb-3">
+                    <label for="min_cores" class="form-label">Минимальное количество ядер</label>
+                    <input type="number" id="min_cores" name="min_cores" class="form-control" placeholder="0"
+                        {% if min_cores %}value="{{ min_cores }}"{% endif %}/>
+                </div>
+                <div class="mb-3">
+                    <label for="min_ram" class="form-label">Минимальная память RAM (GB)</label>
+                    <input type="number" id="min_ram" name="min_ram" class="form-control" placeholder="0"
+                        {% if min_ram %}value="{{ min_ram }}"{% endif %}/>
+                </div>
+                <div class="mb-3">
+                    <label for="min_rom" class="form-label">Минимальная память ROM (GB)</label>
+                    <input type="number" id="min_rom" name="min_rom" class="form-control" placeholder="0"
+                        {% if min_rom %}value="{{ min_rom }}"{% endif %}/>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Применить</button>
+            </div>
+        </form>
+
+        <!-- Вывод данных -->
+        {% for server_type, locations in data.items() %}
+        <div class="card mb-4">
+            <div class="card-header bg-secondary text-white">
+                <h2 class="m-2">{{ server_type }}</h2>
+            </div>
+            <div class="card-body">
+                {% for location_name, location_data in locations.items() %}
+                <div class="row mb-3">
+                    <div class="col-md-2">
+                        <h5>
+                            <img src="{{ location_data.img_src }}" class="small-img me-2" alt="Локация" width="24px" height="24px">
+                            <span>{{ location_name }}</span>
+<!--                            <button type="button"-->
+<!--                                class="btn btn-outline-secondary btn-sm ms-2"-->
+<!--                                data-bs-toggle="tooltip"-->
+<!--                                data-bs-placement="right"-->
+<!--                                data-bs-custom-class="custom-tooltip"-->
+<!--                                data-bs-title="{{ location_data.about_server_type }}" >?</button>-->
+                        </h5>
+                        <p>{{ location_data.about_server_type }}</p>
+                    </div>
+                    <div class="col-md-10">
+                        <div class="row mb-3">
+                            {% for tariff in location_data.tariffs %}
+                            <div class="col-md-6 mb-4">
+                                <div class="card p-3">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <p class="mb-1 fs-5">
+                                                <strong>{{ tariff.tariff_name }} </strong>
+                                                {% if tariff.promo %}
+                                                <span class="badge text-warning">{{ tariff.promo }}</span>
+                                                {% endif %}
+                                            </p>
+                                            {% if tariff.first_month_price %}
+                                            <p class="text-warning small">{{ tariff.first_month_price }}</p>
+                                            {% endif %}
+                                            <h5 class="">{{ tariff.tariff_specs }}</h5>
+                                        </div>
+                                        <div class="col text-end">
+                                            <p class="mb-1 text-muted">час</p>
+                                            {% if tariff.price_per_hour %}
+                                                <a href="{{ tariff.order_link }}" class="btn btn-dark btn-sm text-nowrap"
+                                                   target="_blank"> {{ tariff.price_per_hour }}
+                                                </a>
+                                            {% else %}
+                                                <a href="{{ tariff.order_link }}" class="btn btn-dark btn-sm disabled text-nowrap"
+                                                   target="_blank" tabindex="-1" role="button" aria-disabled="true">
+                                                    N/A
+                                                </a>
+                                            {% endif %}
+
+                                            <p class="mb-1 text-muted">месяц</p>
+                                            {% if tariff.price_per_month %}
+                                                <a href="{{ tariff.order_link }}" class="btn btn-dark btn-sm"
+                                                   target="_blank"> {{ tariff.price_per_month }}
+                                                </a>
+                                            {% else %}
+                                                <a href="{{ tariff.order_link }}" class="btn btn-dark btn-sm disabled"
+                                                   target="_blank" tabindex="-1" role="button" aria-disabled="true">
+                                                    N/A
+                                                </a>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+
+        {% if not data %}
+            <p class="alert alert-warning">Список пуст</p>
+        {% endif %}
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+  return new bootstrap.Tooltip(tooltipTriggerEl)
+})
+</script>
+
+</body>
+</html>
