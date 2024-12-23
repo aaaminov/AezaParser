@@ -1,0 +1,6 @@
+flask
+selenium
+webdriver-manager
+flask_sqlalchemy
+
+
